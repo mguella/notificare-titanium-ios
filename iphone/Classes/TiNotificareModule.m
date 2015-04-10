@@ -263,5 +263,22 @@
         
 }
 
+-(void)openBeacons:(id)arg
+{
+    ENSURE_UI_THREAD_0_ARGS;
+    
+    [[NotificarePushLib shared] openBeacons];
+    
+}
+
+-(void)openUserPreferences:(id)arg
+{
+    
+    ENSURE_UI_THREAD_0_ARGS;
+    
+    [[NotificarePushLib shared] openUserPreferences];
+    
+}
+
 
 @end
