@@ -67,8 +67,20 @@
     
 }
 
+- (void)notificarePushLib:(NotificarePushLib *)library didLoadStore:(NSArray *)products{
+    
+    [self fireEvent:@"store" withObject:products];
+}
+
 - (void)notificarePushLib:(NotificarePushLib *)library didFailToStartLocationServiceWithError:(NSError *)error{
-    NSLog(@"[INFO] %@ didFailToStartLocationServiceWithError", error);
+    
+    [self fireEvent:@"errors" withObject:error];
+    
+}
+
+- (void)notificarePushLib:(NotificarePushLib *)library didUpdateLocations:(NSArray *)locations{
+    
+    [self fireEvent:@"location" withObject:locations];
 }
 
 - (void)notificarePushLib:(NotificarePushLib *)library didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region{

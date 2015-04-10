@@ -1,106 +1,113 @@
-Appcelerator Titanium Mobile Module Project
-===========================================
+# Notificare Module
 
-This is a skeleton Titanium Mobile Mobile module project.
+## Description
 
+A module to integrate Notificare Push API
 
-MODULE NAMING
--------------
+## Accessing the Notificare Module
 
-Choose a unique module id for your module.  This ID usually follows a namespace
-convention using DNS notation.  For example, com.appcelerator.module.test.  This
-ID can only be used once by all public modules in Titanium.
+To access this module from JavaScript, you would do the following:
 
+	var Notificare = require("re.notifica.titanium");
 
-GET STARTED
-------------
+The Notificare variable is a reference to the Module object.	
 
-1. Edit manifest with the appropriate details about your module.
-2. Edit LICENSE to add your license details.
-3. Place any assets (such as PNG files) that are required anywhere in the module folder.
-4. Edit the timodule.json and configure desired settings.
-5. Code and build.
+## Reference
 
+### Notificare.launch
 
-DOCUMENTATION FOR YOUR MODULE
------------------------------
+This is the first call you should make, when launching the app.
+Configures Notificare, starts listeners for application lifecycle events
 
-You should provide at least minimal documentation for your module in `documentation` folder using the Markdown syntax.
+Parameters:
 
-For more information on the Markdown syntax, refer to this documentation at:
+- config {developmentKey {String}, developmentSecret {String}, productionKey {String}, productionSecret {String}, development {Boolean} }
 
-<http://daringfireball.net/projects/markdown/>
+### Notificare.registerDevice
 
+Registers the device with Notificare API
 
-TEST HARNESS EXAMPLE FOR YOUR MODULE
-------------------------------------
+Parameters:
 
-The `example` directory contains a skeleton application test harness that can be
-used for testing and providing an example of usage to the users of your module.
+- userID (optional) {String}
+- userName (optional) {String}
+- callback {Function} A callback({Error})
 
+### Notificare.getNotification
 
-BUILDING YOUR MODULE
---------------------
+Retrieve the full notification object from Notificare API
 
-Simply run `titanium build --platform <name of platform> --build-type production --dir /path/to/module`.
-You can omit the --dir option if your working directory is in the module's project directory.
+Parameters:
 
+- notification {String} The ID of the notification, as passed in from APNS
+- callback {Function} A callback({Error},{Notification}) 
 
-INSTALL YOUR MODULE
--------------------
+### Notificare.addDeviceTags
 
-Mac OS X
---------
-Copy the distribution zip file into the `~/Library/Application Support/Titanium` folder
+Adds one or more tags to the device in Notificare API
 
-Linux
------
-Copy the distribution zip file into the `~/.titanium` folder
+Parameters:
 
-Windows
--------
-Copy the distribution zip file into the `C:\ProgramData\Titanium` folder
+- tags [{String}]
+- callback {Function} A callback({Error})
 
+### Notificare.removeDeviceTag
 
-REGISTER YOUR MODULE
---------------------
+Removes a tags from the device in Notificare API
 
-Register your module with your application by editing `tiapp.xml` and adding your module.
-Example:
+Parameters:
 
-<modules>
-	<module version="0.1">ti.notificare</module>
-</modules>
+- tag {String}
+- callback {Function} A callback({Error})
 
-When you run your project, the compiler will combine your module along with its dependencies
-and assets into the application.
+### Notificare.clearDeviceTags
 
+Clears tags of the device in Notificare API
 
-USING YOUR MODULE IN CODE
--------------------------
+Parameters:
 
-To use your module in code, you will need to require it.
+- callback {Function} A callback({Error})
 
-For example,
+### Notificare.getDeviceTags
 
-	var my_module = require('ti.notificare');
-	my_module.foo();
+Gets the tags that were registered for the device in Notificare API
 
+Parameters:
 
-TESTING YOUR MODULE
--------------------
+- callback {Function} A callback({Error}, [{String}])
 
-To test with the script, execute:
+### Notificare.reply
 
-	titanium run --dir=YOURMODULEDIR
+Sends action replies back to Notificare
 
-This will execute the app.js in the example folder as a Titanium application.
+Parameters:
 
+- notification {String} The ID of the notification
+- label {String} The action label
+- data {Object} (optional) Action data
 
-DISTRIBUTING YOUR MODULE
--------------------------
+### Notificare.logOpenNotification
 
-You can choose to manually distribute your module distribution zip file or through the Titanium Marketplace!
+Log the opening of a notification
+
+Parameters:
+
+- notification {String} The ID of the notification
+- inBackground {Boolean} Whether the notification was received while the app was in background, i.e., opened from Notification Center
 
 
-Cheers!
+## Usage
+
+See sample app in example/app.js
+
+
+## Author
+
+Joris Verbogt <joris@notifica.re>
+
+Copyright (c) 2014 Notificare B.V.
+
+
+## License
+
+Simplified BSD
