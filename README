@@ -2,98 +2,74 @@
 
 ## Description
 
-A module to integrate Notificare Push API
+Titanium module for Notificare Mobile Marketing Platform. Before start make sure you grab the DefaultTheme.bundle, Notificare.plist and NotificareTags.plist from https://github.com/Notificare/notificare-push-lib and place it in your app's assets folder. Notificare.plist is the configuration file where you should make changes to match your app's settings.
 
 ## Accessing the Notificare Module
 
 To access this module from JavaScript, you would do the following:
 
-	var Notificare = require("re.notifica.titanium");
+	var Notificare = require("ti.notificare");
 
 The Notificare variable is a reference to the Module object.	
 
 ## Reference
 
-### Notificare.launch
+### Notificare.addEventListener
 
-This is the first call you should make, when launching the app.
-Configures Notificare, starts listeners for application lifecycle events
+Notificare will be initialized at launch automatically. But before you can request any of the methods you must wait for the 'ready' event to be fired. Additionally you can also listen to the 'registered' event, triggered in response to Notificare.registerDevice() and the 'range' event that is fired any time iBeacons are in range.
 
 Parameters:
 
-- config {developmentKey {String}, developmentSecret {String}, productionKey {String}, productionSecret {String}, development {Boolean} }
+- event (required) {String} A string representing the event to listen to
+- callback {Function} A callback ({Object})
+
+### Notificare.userID
+
+Sets the userID to which any device registration will be assigned to. To take effect this must be set before the registerDevice method.
+
+### Notificare.userName
+
+Sets the username to which any device registration will be assigned to. To take effect this must be set before the registerDevice method.
 
 ### Notificare.registerDevice
 
-Registers the device with Notificare API
+Registers the device with Notificare. It should be used in used from the success function of Ti.Network.registerForPushNotifications.
 
 Parameters:
 
-- userID (optional) {String}
-- userName (optional) {String}
-- callback {Function} A callback({Error})
+- token (required) {String}
 
-### Notificare.getNotification
+### Notificare.openNotification
 
-Retrieve the full notification object from Notificare API
+Open an incoming notification. It should be used in used from the callback function of Ti.Network.registerForPushNotifications.
 
 Parameters:
 
-- notification {String} The ID of the notification, as passed in from APNS
-- callback {Function} A callback({Error},{Notification}) 
+- notification {Object} The payload received of the incoming notification 
 
-### Notificare.addDeviceTags
+### Notificare.startLocationUpdates
 
-Adds one or more tags to the device in Notificare API
+Start location services. This should only be called after the event 'registered' has been fired.
+
+Parameters:
+
+- notification {Object} The payload received of the incoming notification 
+
+### Notificare.addTags
+
+Adds one or more tags to the device. This should only be called after the event 'registered' has been fired.
 
 Parameters:
 
 - tags [{String}]
-- callback {Function} A callback({Error})
 
-### Notificare.removeDeviceTag
+### Notificare.removeTag
 
-Removes a tags from the device in Notificare API
+Removes a tag from the device.  This should only be called after the event 'registered' has been fired.
 
 Parameters:
 
 - tag {String}
-- callback {Function} A callback({Error})
-
-### Notificare.clearDeviceTags
-
-Clears tags of the device in Notificare API
-
-Parameters:
-
-- callback {Function} A callback({Error})
-
-### Notificare.getDeviceTags
-
-Gets the tags that were registered for the device in Notificare API
-
-Parameters:
-
-- callback {Function} A callback({Error}, [{String}])
-
-### Notificare.reply
-
-Sends action replies back to Notificare
-
-Parameters:
-
-- notification {String} The ID of the notification
-- label {String} The action label
-- data {Object} (optional) Action data
-
-### Notificare.logOpenNotification
-
-Log the opening of a notification
-
-Parameters:
-
-- notification {String} The ID of the notification
-- inBackground {Boolean} Whether the notification was received while the app was in background, i.e., opened from Notification Center
 
 
 ## Usage
@@ -101,11 +77,12 @@ Parameters:
 See sample app in example/app.js
 
 
-## Author
+## Authors
 
+Joel Oliveira <joel@notifica.re>
 Joris Verbogt <joris@notifica.re>
 
-Copyright (c) 2014 Notificare B.V.
+Copyright (c) 2015 Notificare B.V.
 
 
 ## License
