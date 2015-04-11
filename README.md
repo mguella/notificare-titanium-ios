@@ -16,7 +16,9 @@ The Notificare variable is a reference to the Module object.
 
 ### Notificare.addEventListener
 
-Notificare will be initialized at launch automatically. But before you can request any of the methods you must wait for the 'ready' event to be fired. Additionally you can also listen to the 'registered' event, triggered in response to Notificare.registerDevice() and the 'range' event that is fired any time iBeacons are in range.
+Notificare will be initialized at launch automatically. But before you can request any of the methods you must wait for the 'ready' event to be fired. 
+Additionally you can also listen to the 'registered' event, triggered in response to Notificare.registerDevice(), the 'range' event that is fired any time iBeacons are in range,
+the 'location' event which is fired any time a user moves significantly and the 'transaction' and 'download' events in response to a buyProduct() request.
 
 Parameters:
 
@@ -25,11 +27,12 @@ Parameters:
 
 ### Notificare.userID
 
-Sets the userID to which any device registration will be assigned to. To take effect this must be set before the registerDevice method.
+Set this value to register the device with a userID. It should be set before calling Notificare.registerDevice().
 
 ### Notificare.userName
 
-Sets the username to which any device registration will be assigned to. To take effect this must be set before the registerDevice method.
+Set this value to register the device with a userName. To use this, userID must be also set. It should be set before calling Notificare.registerDevice().
+
 
 ### Notificare.registerDevice
 
@@ -38,6 +41,7 @@ Registers the device with Notificare. It should be used in used from the success
 Parameters:
 
 - token (required) {String}
+
 
 ### Notificare.openNotification
 
@@ -71,6 +75,13 @@ Parameters:
 
 - tag {String}
 
+### Notificare.buyProduct
+
+Starts a transaction with the App Store. This should only be called after the event 'store' has been fired.
+
+Parameters:
+
+- identifier {String} Use the product identifier to start a transaction
 
 ## Usage
 
