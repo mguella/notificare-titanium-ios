@@ -16,12 +16,23 @@ The Notificare variable is a reference to the Module object.
 
 ### Notificare.addEventListener
 
-Notificare will be initialized at launch automatically. But before you can request any of the methods you must wait for the 'ready' event to be fired. Additionally you can also listen to the 'registered' event, triggered in response to Notificare.registerDevice() and the 'range' event that is fired any time iBeacons are in range.
+Notificare will be initialized at launch automatically. But before you can request any of the methods you must wait for the 'ready' event to be fired. 
+Additionally you can also listen to the 'registered' event, triggered in response to Notificare.registerDevice(), the 'range' event that is fired any time iBeacons are in range,
+the 'location' event which is fired any time a user moves significantly and the 'transaction' and 'download' events in response to a buyProduct() request.
 
 Parameters:
 
 - event (required) {String} A string representing the event to listen to
 - callback {Function} A callback ({Object})
+
+### Notificare.userID
+
+Set this value to register the device with a userID. It should be set before calling Notificare.registerDevice().
+
+### Notificare.userName
+
+Set this value to register the device with a userName. To use this, userID must be also set. It should be set before calling Notificare.registerDevice().
+
 
 ### Notificare.registerDevice
 
@@ -30,8 +41,7 @@ Registers the device with Notificare. It should be used in used from the success
 Parameters:
 
 - token (required) {String}
-- userID (optional) {String}
-- userName (optional) {String}
+
 
 ### Notificare.openNotification
 
@@ -65,6 +75,13 @@ Parameters:
 
 - tag {String}
 
+### Notificare.buyProduct
+
+Starts a transaction with the App Store. This should only be called after the event 'store' has been fired.
+
+Parameters:
+
+- identifier {String} Use the product identifier to start a transaction
 
 ## Usage
 

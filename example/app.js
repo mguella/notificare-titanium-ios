@@ -66,14 +66,58 @@ notificare.addEventListener('ready',function(e){
 });
 
 //Listen for the device registered event
-//Only after this event occurs it is safe to start location updates or add/remove tags
+//Only after this event occurs it is safe call any other method
 notificare.addEventListener('registered', function(e){
 	 startLocationUpdates(e);
-	 addTags(['one','two']);
+	 //addTags(['one','two']);
+	 //openUserPreferences(e);
+	 //openBeacons(e);
+	 var tag = "one,two";
+	 removeTag(tag);
+});
+
+notificare.addEventListener('tags', function(e){
+	e.tags.forEach(function(tag){
+		Ti.API.info("Device Tag: " + tag);
+	});
+	 
+});
+
+notificare.addEventListener('location', function(e){
+	 Ti.API.info("User location changed " + e.latitude + e.longitude);
+});
+
+notificare.addEventListener('store', function(e){
+	 Ti.API.info("In-App Products Store loaded " + e.products);
+});
+
+notificare.addEventListener('transaction', function(e){
+	 Ti.API.info(e.message + e.transaction);
+});
+
+notificare.addEventListener('download', function(e){
+	 Ti.API.info(e.message + e.download);
+});
+
+notificare.addEventListener('store', function(e){
+	 e.products.forEach(function(product){
+		Ti.API.info("Product: " + product.identifer + product.name);
+	});
+	 //After this trigger is it safe to buy products
+	 // use Notificare.buyProduct(product.identifier);
+	 // To buy products
+	 
+});
+
+notificare.addEventListener('errors', function(e){
+	 Ti.API.info("There was an error " + e.error);
+	 Ti.API.info("with message " + e.message);
 });
 
 notificare.addEventListener('range', function(e){
-	 Ti.API.info("list of beacons in range " + e);
+	e.beacons.forEach(function(beacon){
+		Ti.API.info("Beacon: " + beacon.uuid + beacon.proximity);
+	});
 });
 
 
@@ -85,6 +129,8 @@ function receivePush(e) {
 // Register the device with Notificare
 function deviceTokenSuccess(e) {
     deviceToken = e.deviceToken;
+    // notificare.userID = 'testing123';
+    // notificare.userName = 'Name here';
     notificare.registerDevice(deviceToken);
 }
 function deviceTokenError(e) {
@@ -97,4 +143,18 @@ function startLocationUpdates(e) {
 //Add tags
 function addTags(e) {
     notificare.addTags(e);
+}
+
+//Remove tag
+function removeTag(e) {
+    notificare.removeTag(e);
+}
+
+//Open Beacons
+function openBeacons(e) {
+    notificare.openBeacons(e);
+}
+//Open User Preferences
+function openUserPreferences(e) {
+    notificare.openUserPreferences(e);
 }
