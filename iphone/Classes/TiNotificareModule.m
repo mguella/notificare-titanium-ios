@@ -69,23 +69,123 @@
 
 - (void)notificarePushLib:(NotificarePushLib *)library didLoadStore:(NSArray *)products{
     
-    [self fireEvent:@"store" withObject:products];
+    NSMutableArray * prods = [NSMutableArray array];
+    NSMutableDictionary * result = [NSMutableDictionary dictionary];
+    NSMutableDictionary * prod = [NSMutableDictionary dictionary];
+    
+    for (NotificareProduct * product  in products) {
+        [prod setObject:product.productName forKey:@"name"];
+        [prod setObject:product.productDescription forKey:@"description"];
+        [prod setObject:product.identifier forKey:@"identifier"];
+        [prod setObject:product.type forKey:@"type"];
+        [prod setObject:[NSNumber numberWithBool:product.purchased] forKey:@"purchased"];
+        [prod setObject:product.priceLocale forKey:@"price"];
+        
+        NSMutableArray * downloads = [NSMutableArray array];
+        NSMutableDictionary * download = [NSMutableDictionary dictionary];
+        
+        for (SKDownload * d in product.downloads) {
+            [d setValue:d.contentIdentifier forKey:@"contentIdentifier"];
+            [d setValue:[NSString stringWithFormat:@"%f",d.progress] forKey:@"progress"];
+            [d setValue:[NSString stringWithFormat:@"%f",d.timeRemaining] forKey:@"timeRemaining"];
+            [d setValue:[NSNumber numberWithInt:d.downloadState] forKey:@"downloadState"];
+            [downloads addObject:download];
+        }
+        [prod setObject:downloads forKey:@"downloads"];
+        [prods addObject:prod];
+    }
+    
+    [result setValue:prods forKey:@"products"];
+    [self fireEvent:@"store" withObject:result];
+}
+
+
+- (void)notificarePushLib:(NotificarePushLib *)library didFailProductTransaction:(SKPaymentTransaction *)transaction withError:(NSError *)error{
+    
+    NSMutableDictionary * err = [NSMutableDictionary dictionary];
+    [err setValue:@"Transaction failed" forKey:@"message"];
+    [err setValue:error.userInfo.description forKey:@"error"];
+    [self fireEvent:@"errors" withObject:err];
+}
+
+- (void)notificarePushLib:(NotificarePushLib *)library didCompleteProductTransaction:(SKPaymentTransaction *)transaction{
+    
+    NSMutableDictionary * trans = [NSMutableDictionary dictionary];
+    [trans setValue:@"Transaction completed" forKey:@"message"];
+    [trans setValue:transaction.payment.productIdentifier forKey:@"transaction"];
+    [self fireEvent:@"transaction" withObject:trans];
+}
+
+- (void)notificarePushLib:(NotificarePushLib *)library didRestoreProductTransaction:(SKPaymentTransaction *)transaction{
+    
+    NSMutableDictionary * trans = [NSMutableDictionary dictionary];
+    [trans setValue:@"Transaction restored" forKey:@"message"];
+    [trans setValue:transaction.payment.productIdentifier forKey:@"transaction"];
+    [self fireEvent:@"transaction" withObject:trans];
+    
+}
+
+- (void)notificarePushLib:(NotificarePushLib *)library didStartDownloadContent:(SKPaymentTransaction *)transaction{
+    
+    NSMutableDictionary * trans = [NSMutableDictionary dictionary];
+    [trans setValue:@"Started download for transaction" forKey:@"message"];
+    [trans setValue:transaction.payment.productIdentifier forKey:@"transaction"];
+    [self fireEvent:@"transaction" withObject:trans];
+}
+
+- (void)notificarePushLib:(NotificarePushLib *)library didFinishDownloadContent:(SKDownload *)download{
+    
+    NSMutableDictionary * d = [NSMutableDictionary dictionary];
+    [d setValue:@"Download finished" forKey:@"message"];
+    [d setValue:download.transaction.payment.productIdentifier forKey:@"download"];
+    [self fireEvent:@"download" withObject:d];
+}
+
+- (void)notificarePushLib:(NotificarePushLib *)library didFailToLoadStore:(NSError *)error{
+    
+    NSMutableDictionary * err = [NSMutableDictionary dictionary];
+    [err setValue:@"Load store failed" forKey:@"message"];
+    [err setValue:error.userInfo.description forKey:@"error"];
+    [self fireEvent:@"errors" withObject:err];
+    
 }
 
 - (void)notificarePushLib:(NotificarePushLib *)library didFailToStartLocationServiceWithError:(NSError *)error{
     
-    [self fireEvent:@"errors" withObject:error];
+    NSMutableDictionary * err = [NSMutableDictionary dictionary];
+    [err setValue:@"Location services failed" forKey:@"message"];
+    [err setValue:error.userInfo.description forKey:@"error"];
+    [self fireEvent:@"errors" withObject:err];
     
 }
 
 - (void)notificarePushLib:(NotificarePushLib *)library didUpdateLocations:(NSArray *)locations{
-    
-    [self fireEvent:@"location" withObject:locations];
+    CLLocation * lastLocation = (CLLocation *)[locations lastObject];
+    NSMutableDictionary * location = [NSMutableDictionary dictionary];
+    [location setValue:[NSNumber numberWithFloat:[lastLocation coordinate].latitude] forKey:@"latitude"];
+    [location setValue:[NSNumber numberWithFloat:[lastLocation coordinate].longitude] forKey:@"longitude"];
+    [self fireEvent:@"location" withObject:location];
 }
 
 - (void)notificarePushLib:(NotificarePushLib *)library didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region{
     
-    [self fireEvent:@"range" withObject:beacons];
+    NSMutableDictionary * result = [NSMutableDictionary dictionary];
+    NSMutableDictionary * b = [NSMutableDictionary dictionary];
+    NSMutableArray * bcn = [NSMutableArray array];
+    for (NotificareBeacon * beacon in beacons) {
+        [b setObject:beacon.name forKey:@"name"];
+        [b setObject:beacon.purpose forKey:@"purpose"];
+        [b setObject:beacon.notification forKey:@"notification"];
+        [b setObject:beacon.region forKey:@"region"];
+        [b setObject:beacon.beacon.major forKey:@"major"];
+        [b setObject:beacon.beacon.minor forKey:@"minor"];
+        [b setObject:beacon.beacon.proximityUUID forKey:@"uuid"];
+        [b setObject:beacon.beacon.proximity forKey:@"proximity"];
+        [b setObject:beacon.proximityNotifications forKey:@"notifications"];
+        [bcn addObject:b];
+    }
+    [result setValue:bcn forKey:@"beacons"];
+    [self fireEvent:@"range" withObject:result];
     
 }
 
@@ -142,6 +242,7 @@
 
 #pragma Public APIs
 
+
 -(id)userID
 {
     return userId;
@@ -195,6 +296,8 @@
             //
             [self fireEvent:@"registered" withObject:info];
             
+            [self getTags];
+            
         } errorHandler:^(NSError *error) {
             //
         }];
@@ -203,7 +306,7 @@
         [[NotificarePushLib shared] registerDevice:token withUserID:userId completionHandler:^(NSDictionary *info) {
             //
             [self fireEvent:@"registered" withObject:info];
-            
+            [self getTags];
         } errorHandler:^(NSError *error) {
             //
         }];
@@ -211,13 +314,29 @@
         [[NotificarePushLib shared] registerDevice:token completionHandler:^(NSDictionary *info) {
             //
             [self fireEvent:@"registered" withObject:info];
-            
+            [self getTags];
         } errorHandler:^(NSError *error) {
             //
         }];
     }
-    
-    
+ 
+}
+
+-(void)getTags{
+    [[NotificarePushLib shared] getTags:^(NSDictionary *info) {
+        NSMutableArray * t = [NSMutableArray array];
+        for (NSString * tag in [info objectForKey:@"tags"]) {
+            [t addObject:tag];
+        }
+        
+        NSMutableDictionary * tags = [NSMutableDictionary dictionary];
+        [tags setValue:t forKey:@"tags"];
+        
+        [self fireEvent:@"tags" withObject:tags];
+        
+    } errorHandler:^(NSError *error) {
+        //
+    }];
 }
 
 -(void)startLocationUpdates:(id)arg
@@ -243,23 +362,34 @@
     
 }
 
+
 -(void)addTags:(id)arg
 {
 
     ENSURE_UI_THREAD_1_ARG(arg);
-    ENSURE_ARRAY(arg);
+    ENSURE_SINGLE_ARG(arg, NSArray);
     
-    [[NotificarePushLib shared] addTags:arg];
+    [[NotificarePushLib shared] addTags:arg completionHandler:^(NSDictionary *info) {
+        //
+        [self getTags];
+    } errorHandler:^(NSError *error) {
+        //
+    }];
     
 }
 
 -(void)removeTag:(id)arg
 {
-    
-    ENSURE_SINGLE_ARG(arg, NSString);
     ENSURE_UI_THREAD_1_ARG(arg);
-        
-    [[NotificarePushLib shared] removeTag:arg];
+    ENSURE_SINGLE_ARG(arg, NSString);
+
+    [[NotificarePushLib shared] removeTag:arg completionHandler:^(NSDictionary *info) {
+        [self getTags];
+    } errorHandler:^(NSError *error) {
+        //
+    }];
+    
+    
         
 }
 
@@ -287,6 +417,22 @@
     ENSURE_UI_THREAD_0_ARGS;
     
     [[NotificarePushLib shared] openInbox];
+    
+}
+
+-(void)buyProduct:(id)arg
+{
+    
+    ENSURE_UI_THREAD_1_ARG(arg);
+    ENSURE_SINGLE_ARG(arg, NSString);
+    
+    [[NotificarePushLib shared]  fetchProduct:arg completionHandler:^(NotificareProduct *product) {
+        //
+        [[NotificarePushLib shared] buyProduct:product];
+        
+    } errorHandler:^(NSError *error) {
+        //
+    }];
     
 }
 
