@@ -9,6 +9,7 @@
 #import "TiBase.h"
 #import "TiHost.h"
 #import "TiUtils.h"
+#import "NSData+Hex.h"
 
 @implementation TiNotificareModule
 
@@ -37,6 +38,7 @@
     TiThreadPerformOnMainThread(^{
         [[NotificarePushLib shared] launch];
         [[NotificarePushLib shared] setDelegate:self];
+        [[UIApplication sharedApplication] setDelegate:self];
     }, NO);
 
     
@@ -48,6 +50,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAppCreate:)
                                                  name:@"UIApplicationDidFinishLaunchingNotification" object:nil];
+
+    
 }
 
 +(void)onAppCreate:(NSNotification *)notification
@@ -55,10 +59,41 @@
 
     ENSURE_CONSISTENCY([NSThread isMainThread]);
     
+    
     [[NotificarePushLib shared] handleOptions:notification.userInfo];
     
 }
 
+-(void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken{
+
+    NSMutableDictionary * result = [NSMutableDictionary dictionary];
+    [result setValue:[deviceToken hexadecimalString] forKey:@"device"];
+    [self fireEvent:@"registration" withObject:result];
+    
+}
+
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    
+    NSMutableDictionary * result = [NSMutableDictionary dictionary];
+    [result setValue:userInfo forKey:@"notification"];
+    [self fireEvent:@"notification" withObject:result];
+    
+    [[NotificarePushLib shared] openNotification:userInfo];
+    
+}
+
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
+    
+    [[NotificarePushLib shared] saveToInbox:userInfo forApplication:application completionHandler:^(NSDictionary *info) {
+        
+        completionHandler(UIBackgroundFetchResultNewData);
+    } errorHandler:^(NSError *error) {
+        
+        completionHandler(UIBackgroundFetchResultNoData);
+    }];
+}
 
 
 - (void)notificarePushLib:(NotificarePushLib *)library onReady:(NSDictionary *)info{
@@ -433,6 +468,16 @@
     } errorHandler:^(NSError *error) {
         //
     }];
+    
+}
+
+
+-(void)registerForNotifications:(id)arg
+{
+    
+    ENSURE_UI_THREAD_0_ARGS;
+    
+    [[NotificarePushLib shared] registerForNotifications];
     
 }
 

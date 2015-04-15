@@ -8,7 +8,7 @@
 #import "TiModule.h"
 #import "NotificarePushLib.h"
 
-@interface TiNotificareModule : TiModule <NotificarePushLibDelegate> {
+@interface TiNotificareModule : TiModule <NotificarePushLibDelegate, UIApplicationDelegate> {
     NSString * userId;
     NSString * username;
 }
