@@ -4,6 +4,11 @@
 
 Titanium module for Notificare Mobile Marketing Platform. Before you start make sure you grab the DefaultTheme.bundle, Notificare.plist and NotificareTags.plist from https://github.com/Notificare/notificare-push-lib and place it in your app's assets folder. Notificare.plist is the configuration file where you should make changes to match your app's settings.
 
+## Usage
+
+See sample app in example/app.js. For documentation please refer to: https://notificare.atlassian.net/wiki/display/notificare/Getting+started+with+Titanium
+
+
 ## Accessing the Notificare Module
 
 To access this module from JavaScript, you would do the following:
@@ -83,10 +88,6 @@ Starts a transaction with the App Store. This should only be called after the ev
 Parameters:
 
 - identifier {String} Use the product identifier to start a transaction
-
-## Usage
-
-See sample app in example/app.js. For documentation please refer to: https://notificare.atlassian.net/wiki/display/notificare/Getting+started+with+Titanium
 
 
 ## Authors
