@@ -86,6 +86,10 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
     
+    NSMutableDictionary * result = [NSMutableDictionary dictionary];
+    [result setValue:userInfo forKey:@"notification"];
+    [self fireEvent:@"notification" withObject:result];
+    
     [[NotificarePushLib shared] saveToInbox:userInfo forApplication:application completionHandler:^(NSDictionary *info) {
         
         completionHandler(UIBackgroundFetchResultNewData);
